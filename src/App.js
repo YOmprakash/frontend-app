@@ -1,5 +1,4 @@
 // src/App.js
-
 import React, { useState, useEffect, useCallback } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import "./App.css";
@@ -13,10 +12,13 @@ const App = () => {
   const [stats, setStats] = useState({});
   const [barChartData, setBarChartData] = useState([]);
 
+  // Update the backend URL
+  const backendUrl = "http://localhost:3001";
+
   // Use useCallback to memoize the fetchTransactions function
   const fetchTransactions = useCallback(async () => {
     try {
-      const apiUrl = `/api/transactions?month=${selectedMonth}&page=${currentPage}&searchText=${searchText}`;
+      const apiUrl = `${backendUrl}/api/transactions?month=${selectedMonth}&page=${currentPage}&searchText=${searchText}`;
       const response = await fetch(apiUrl);
       const data = await response.json();
 
@@ -40,7 +42,7 @@ const App = () => {
 
   const fetchStatistics = async () => {
     try {
-      const statsUrl = `/api/statistics?month=${selectedMonth}`;
+      const statsUrl = `${backendUrl}/api/statistics?month=${selectedMonth}`;
       const response = await fetch(statsUrl);
       const data = await response.json();
 
@@ -52,7 +54,7 @@ const App = () => {
 
   const fetchBarChartData = async () => {
     try {
-      const barChartDataUrl = `/api/bar-chart?month=${selectedMonth}`;
+      const barChartDataUrl = `${backendUrl}/api/bar-chart?month=${selectedMonth}`;
       const response = await fetch(barChartDataUrl);
       const data = await response.json();
 
@@ -137,13 +139,19 @@ const App = () => {
             </tr>
           </thead>
           <tbody>
-            {transactions.map((transaction) => (
-              <tr key={transaction.id}>
-                <td>{transaction.title}</td>
-                <td>{transaction.description}</td>
-                <td>{transaction.price}</td>
+            {Array.isArray(transactions) && transactions.length > 0 ? (
+              transactions.map((transaction) => (
+                <tr key={transaction.id}>
+                  <td>{transaction.title}</td>
+                  <td>{transaction.description}</td>
+                  <td>{transaction.price}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3">No transactions available</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
